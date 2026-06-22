@@ -1,0 +1,174 @@
+/* ============================================================================
+   NiCE Brand Design System — 2026  (Brand Guidelines v2)
+   The single source of visual truth for NiCE / NiCE CXone collateral.
+   Link this file from any HTML deck, document, one-pager, email or web mock.
+   Spelling rule: always "NiCE" (capital N, C, E + lowercase i). No exceptions.
+   ============================================================================ */
+
+/* Brand typeface: Be Vietnam Pro (free Google font). Official system fallback: Arial. */
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap');
+
+:root {
+  /* --- PRIMARY PALETTE --------------------------------------------------- */
+  --nice-blue:        #3694fc;   /* Pantone 285 C — the hero color, dominant in gradients */
+  --nice-white:       #ffffff;
+  --nice-charcoal:    #21212b;   /* the dominant brand color — default dark background */
+  --nice-warm-white:  #f2f0eb;   /* PANELS / squircles ONLY — never a full-bleed background */
+
+  /* --- SECONDARY PALETTE (highlights, gradients, icons) ------------------- */
+  --nice-emerald:     #00e2a0;   /* Pantone 2268 C */
+  --nice-teal:        #36ead0;   /* Pantone 6142 C */
+  --nice-blue-2:      #3694fc;
+  --nice-emerald-lt:  #9ceed2;
+  --nice-teal-lt:     #acf7f3;
+  --nice-blue-lt:     #a7d0fe;
+  --nice-blue-deep:   #025afb;   /* Pantone 2728 */
+  --nice-purple:      #6100ff;   /* Pantone 2368 */
+  --nice-pink:        #ff5b8a;   /* Pantone 184 C */
+  --nice-blue-soft:   #90b6fd;
+  --nice-lilac:       #b98fff;
+  --nice-pink-soft:   #f3b1c4;
+
+  /* --- TYPOGRAPHY -------------------------------------------------------- */
+  --nice-font: 'Be Vietnam Pro', Arial, system-ui, sans-serif;
+  --w-light: 300;     /* body copy */
+  --w-regular: 400;   /* feature copy */
+  --w-medium: 500;    /* labels */
+  --w-semibold: 600;  /* headlines, subheadings */
+
+  /* Tracking: brand spec is optical -20 (≤60pt) / -30 (>60pt). ≈ these em values. */
+  --track-tight: -0.02em;
+  --track-tighter: -0.03em;
+
+  /* --- SHAPE / SPACING --------------------------------------------------- */
+  --radius-squircle: 28%;   /* squircle — corner arc is fixed, never distort */
+  --radius-panel: 22px;     /* rounded-corner panel — subtler nod to the squircle */
+  --radius-bubble: 18px;    /* chat bubble */
+  --radius-pill: 999px;
+  --space: 8px;
+
+  /* --- GRADIENTS (must be ≥50% NiCE blue; generated/used in RGB) --------- */
+  --grad-signature: linear-gradient(125deg, #025afb 0%, #3694fc 45%, #36ead0 100%);
+  --grad-blue-emerald: linear-gradient(135deg, #025afb 0%, #3694fc 50%, #00e2a0 100%);
+  --grad-blue-teal: linear-gradient(135deg, #3694fc 0%, #36ead0 100%);
+  --grad-blue-purple: linear-gradient(135deg, #6100ff 0%, #3694fc 70%, #3694fc 100%);
+  --grad-cool-soft: linear-gradient(160deg, #3694fc 0%, #90b6fd 55%, #a7d0fe 100%);
+  --grad-charcoal: linear-gradient(160deg, #2a2a37 0%, #21212b 60%, #16161d 100%);
+
+  --ink: var(--nice-charcoal);
+  --shadow-soft: 0 18px 50px rgba(16,16,24,.18);
+}
+
+/* ============================================================================
+   BASE
+   ============================================================================ */
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  font-family: var(--nice-font);
+  font-weight: var(--w-light);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ============================================================================
+   TYPOGRAPHY  (sentence case only — never UPPERCASE, never Title Case)
+   ============================================================================ */
+.nice-display { font-weight: var(--w-semibold); font-size: clamp(40px, 6vw, 88px);
+  line-height: 1.04; letter-spacing: var(--track-tighter); margin: 0; }
+.nice-h1 { font-weight: var(--w-semibold); font-size: clamp(32px, 4.4vw, 56px);
+  line-height: 1.06; letter-spacing: var(--track-tighter); margin: 0; }
+.nice-h2 { font-weight: var(--w-semibold); font-size: clamp(24px, 3vw, 36px);
+  line-height: 1.2; letter-spacing: var(--track-tight); margin: 0; }
+.nice-feature { font-weight: var(--w-regular); font-size: clamp(22px, 2.6vw, 34px);
+  line-height: 1.15; letter-spacing: var(--track-tight); margin: 0; }
+.nice-body { font-weight: var(--w-light); font-size: clamp(16px, 1.4vw, 20px);
+  line-height: 1.28; letter-spacing: var(--track-tight); margin: 0 0 1em; }
+.nice-label { font-weight: var(--w-medium); font-size: 14px; line-height: 1.2;
+  letter-spacing: 0; margin: 0; }
+.nice-eyebrow { font-weight: var(--w-medium); font-size: 13px; letter-spacing: .04em;
+  text-transform: none; opacity: .7; margin: 0 0 12px; }
+
+/* ============================================================================
+   HIGHLIGHT DEVICE — the signature NiCE chat-bubble pill behind a key word.
+   Rules: only 1–2 words per bubble, never on consecutive words, never >1 line.
+   Keep the text color of the WHOLE statement consistent; vary bubble colors.
+   ============================================================================ */
+.nice-hl { display: inline-block; border-radius: var(--radius-pill);
+  padding: .04em .42em; margin: 0 .12em; line-height: 1.18; white-space: nowrap; }
+.nice-hl--emerald { background: var(--nice-emerald); }
+.nice-hl--teal    { background: var(--nice-teal); }
+.nice-hl--blue    { background: var(--nice-blue); }
+.nice-hl--bluelt  { background: var(--nice-blue-lt); }
+.nice-hl--pink    { background: var(--nice-pink); }
+.nice-hl--purple  { background: var(--nice-purple); }
+.nice-hl--lilac   { background: var(--nice-lilac); }
+/* accessible text-on-pill helpers */
+.nice-hl--blue, .nice-hl--purple { color: var(--nice-white); }
+.nice-hl--emerald, .nice-hl--teal, .nice-hl--bluelt, .nice-hl--pink, .nice-hl--lilac { color: var(--nice-charcoal); }
+
+/* ============================================================================
+   GRAPHIC LANGUAGE — squircle, chat bubble, rounded panel
+   ============================================================================ */
+.nice-squircle { border-radius: var(--radius-squircle); overflow: hidden; }
+.nice-panel { background: var(--nice-warm-white); color: var(--nice-charcoal);
+  border-radius: var(--radius-panel); padding: 28px 32px; }
+.nice-panel--white { background: var(--nice-white); }
+.nice-panel--charcoal { background: var(--nice-charcoal); color: var(--nice-white); }
+.nice-panel--gradient { background: var(--grad-signature); color: var(--nice-white); }
+
+.nice-bubble { position: relative; display: inline-block; background: var(--nice-white);
+  color: var(--nice-charcoal); border-radius: var(--radius-bubble); padding: 14px 20px;
+  font-weight: var(--w-regular); box-shadow: var(--shadow-soft); }
+.nice-bubble--blue { background: var(--nice-blue); color: var(--nice-white); }
+.nice-bubble--charcoal { background: var(--nice-charcoal); color: var(--nice-white); }
+.nice-bubble::after { content: ''; position: absolute; left: 26px; bottom: -9px;
+  border: 10px solid transparent; border-top-color: var(--nice-white); border-bottom: 0; }
+.nice-bubble--blue::after { border-top-color: var(--nice-blue); }
+.nice-bubble--charcoal::after { border-top-color: var(--nice-charcoal); }
+
+/* small smile/avatar dot (the brand "smile symbol" mark) */
+.nice-smile { width: 56px; height: 56px; border-radius: var(--radius-squircle);
+  background: var(--grad-signature); display: inline-flex; align-items: center;
+  justify-content: center; }
+
+/* ============================================================================
+   STAT — big-number feature block (decks love these)
+   ============================================================================ */
+.nice-stat { font-weight: var(--w-semibold); letter-spacing: var(--track-tighter);
+  font-size: clamp(56px, 9vw, 132px); line-height: .95; }
+
+/* ============================================================================
+   BUTTON / CTA
+   ============================================================================ */
+.nice-btn { display: inline-block; font-weight: var(--w-medium); font-size: 16px;
+  text-decoration: none; padding: 14px 26px; border-radius: var(--radius-pill);
+  background: var(--nice-blue); color: var(--nice-white); border: 0; cursor: pointer; }
+.nice-btn--ghost { background: transparent; color: var(--nice-blue);
+  box-shadow: inset 0 0 0 2px var(--nice-blue); }
+.nice-btn--light { background: var(--nice-white); color: var(--nice-charcoal); }
+
+/* ============================================================================
+   SURFACES — section backgrounds
+   ============================================================================ */
+.bg-charcoal { background: var(--nice-charcoal); color: var(--nice-white); }
+.bg-white { background: var(--nice-white); color: var(--nice-charcoal); }
+.bg-blue { background: var(--nice-blue); color: var(--nice-white); }
+.bg-grad { background: var(--grad-signature); color: var(--nice-white); }
+.bg-grad-soft { background: var(--grad-cool-soft); color: var(--nice-charcoal); }
+
+/* ============================================================================
+   LOGO placement helper — clear space ≈ the width of the "N". Min height 30px.
+   ============================================================================ */
+.nice-logo { height: 34px; width: auto; display: block; }
+.nice-logo--lg { height: 48px; }
+.nice-logo--sm { height: 24px; }
+
+/* image treatments */
+.nice-img-cover { width: 100%; height: 100%; object-fit: cover; display: block; }
+.nice-img-contained { border-radius: var(--radius-panel); overflow: hidden; }
+
+/* blur-bubble effect: a frosted chat bubble over imagery */
+.nice-blur-bubble { backdrop-filter: blur(14px); background: rgba(255,255,255,.18);
+  border-radius: var(--radius-bubble); padding: 14px 20px; color: var(--nice-white); }

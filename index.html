@@ -3,165 +3,182 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>CXone Churn Lab — from data to decision with Claude</title>
-<meta name="description" content="A hands-on, beginner-friendly Claude lab. Download a synthetic NiCE CXone customer dataset and use copy-paste prompts to go from raw data to insights, a landing page, an MVP, and a management deck." />
+<title>NiCE CXone Churn Lab — from data to decision with Claude</title>
+<meta name="description" content="A hands-on Claude lab from NiCE CXone. Download a synthetic customer dataset and use copy-paste prompts to go from raw data to insights, a landing page, an MVP, and a management deck." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
+<link href="assets/nice-brand.css" rel="stylesheet" />
 <style>
-  :root{
-    --charcoal:#16161d;
-    --charcoal-2:#1c1c26;
-    --panel:#21212b;
-    --panel-2:#262633;
-    --blue:#3694fc;
-    --blue-soft:#6fb2ff;
-    --emerald:#00e2a0;
-    --teal:#36ead0;
-    --warm:#f2f0eb;
-    --white:#ffffff;
-    --mut:#a7a7b4;
-    --mut-2:#7c7c8a;
-    --line:rgba(255,255,255,.09);
-    --radius:18px;
-    --shadow:0 24px 60px rgba(0,0,0,.45);
-  }
-  *{box-sizing:border-box}
+  /* ---- supplemental layout, built on the NiCE design tokens ---- */
+  :root{ --mut:#b6b6c2; --mut-2:#8b8b98; --line:rgba(255,255,255,.10); }
   html{scroll-behavior:smooth}
   body{
-    margin:0;font-family:'Be Vietnam Pro',Arial,sans-serif;background:var(--charcoal);
-    color:var(--white);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+    background:var(--grad-charcoal);background-attachment:fixed;color:var(--nice-white);
+    font-family:var(--nice-font);font-weight:var(--w-light);line-height:1.5;overflow-x:hidden;min-height:100vh;
   }
   a{color:inherit;text-decoration:none}
-  ::selection{background:var(--blue);color:#fff}
+  ::selection{background:var(--nice-blue);color:#fff}
   .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  .ms{font-family:'Material Symbols Rounded';font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;
+    font-size:1.15em;line-height:1;vertical-align:-.18em;display:inline-block}
 
-  /* glow background */
   .bg-glow{position:fixed;inset:0;z-index:0;pointer-events:none;
     background:
-      radial-gradient(50% 40% at 15% 0%, rgba(54,148,252,.20), transparent 60%),
-      radial-gradient(40% 35% at 90% 10%, rgba(0,226,160,.12), transparent 60%),
-      radial-gradient(45% 45% at 50% 100%, rgba(54,148,252,.10), transparent 60%);
-  }
+      radial-gradient(46% 38% at 14% 0%, rgba(54,148,252,.22), transparent 60%),
+      radial-gradient(40% 34% at 92% 8%, rgba(54,234,208,.12), transparent 60%),
+      radial-gradient(44% 44% at 50% 102%, rgba(2,90,251,.14), transparent 60%);}
 
   /* nav */
   nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);
-    background:rgba(22,22,29,.72);border-bottom:1px solid var(--line)}
-  .nav-in{display:flex;align-items:center;justify-content:space-between;height:64px}
-  .brand{display:flex;align-items:center;gap:11px;font-weight:700;letter-spacing:-.01em}
-  .logo-dot{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--blue),var(--teal));
-    display:grid;place-items:center;font-weight:800;color:#06131f;font-size:15px;box-shadow:0 6px 18px rgba(54,148,252,.4)}
-  .brand b{color:var(--white)}.brand span{color:var(--blue)}
-  .nav-links{display:flex;gap:8px;align-items:center}
-  .nav-links a{font-size:14px;color:var(--mut);padding:8px 12px;border-radius:10px;transition:.2s}
-  .nav-links a:hover{color:var(--white);background:rgba(255,255,255,.05)}
-  .nav-links .ghub{border:1px solid var(--line)}
-  @media(max-width:720px){.nav-links a:not(.ghub){display:none}}
+    background:rgba(22,22,29,.74);border-bottom:1px solid var(--line)}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;height:66px}
+  .brand{display:flex;align-items:center;gap:14px}
+  .brand img{height:28px;width:auto;display:block}
+  .brand .div{width:1px;height:22px;background:var(--line)}
+  .brand .lab{font-weight:var(--w-medium);font-size:14px;color:var(--mut);letter-spacing:var(--track-tight)}
+  .nav-links{display:flex;gap:6px;align-items:center}
+  .nav-links a{font-size:14px;font-weight:var(--w-medium);color:var(--mut);padding:8px 13px;border-radius:var(--radius-pill);transition:.2s}
+  .nav-links a:hover{color:var(--nice-white);background:rgba(255,255,255,.06)}
+  .nav-links .dl{color:var(--nice-charcoal);background:var(--nice-blue)}
+  .nav-links .dl:hover{filter:brightness(1.07);background:var(--nice-blue)}
+  @media(max-width:720px){.nav-links a:not(.dl){display:none}.brand .lab{display:none}}
 
   /* hero */
-  header{position:relative;z-index:1;padding:88px 0 64px}
-  .pill{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--teal);
-    background:rgba(0,226,160,.10);border:1px solid rgba(0,226,160,.28);padding:7px 13px;border-radius:999px;margin-bottom:24px}
-  .pill .d{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 10px var(--teal)}
-  h1{font-size:clamp(38px,6.4vw,68px);line-height:1.03;font-weight:800;letter-spacing:-.025em;margin:0 0 20px}
-  .hl{position:relative;white-space:nowrap}
-  .hl::after{content:"";position:absolute;left:-6px;right:-6px;top:6%;bottom:6%;background:var(--blue);
-    border-radius:14px 14px 14px 4px;z-index:-1;opacity:.92}
-  .lead{font-size:clamp(17px,2.2vw,21px);color:var(--mut);max-width:640px;margin:0 0 34px;font-weight:300}
-  .lead b{color:var(--warm);font-weight:500}
-  .cta-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
-  .btn{display:inline-flex;align-items:center;gap:10px;font-family:inherit;font-size:15px;font-weight:600;
-    padding:14px 22px;border-radius:13px;border:1px solid transparent;cursor:pointer;transition:.22s;text-align:center}
-  .btn-primary{background:var(--blue);color:#04101f;box-shadow:0 14px 34px rgba(54,148,252,.42)}
-  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 20px 44px rgba(54,148,252,.55)}
-  .btn-ghost{background:rgba(255,255,255,.04);border-color:var(--line);color:var(--white)}
-  .btn-ghost:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.2)}
+  header{position:relative;z-index:1;padding:86px 0 56px}
+  .eyepill{display:inline-flex;align-items:center;gap:9px;font-size:13px;font-weight:var(--w-medium);color:var(--nice-teal);
+    background:rgba(54,234,208,.10);border:1px solid rgba(54,234,208,.30);padding:7px 15px;border-radius:var(--radius-pill);margin-bottom:26px}
+  .eyepill .d{width:7px;height:7px;border-radius:50%;background:var(--nice-teal);box-shadow:0 0 10px var(--nice-teal)}
+  h1.hero{font-weight:var(--w-semibold);font-size:clamp(40px,6.4vw,82px);line-height:1.04;
+    letter-spacing:var(--track-tighter);margin:0 0 22px;max-width:14ch}
+  .lead{font-weight:var(--w-light);font-size:clamp(17px,2.1vw,21px);color:var(--mut);max-width:640px;
+    margin:0 0 34px;letter-spacing:var(--track-tight)}
+  .lead b{color:var(--nice-white);font-weight:var(--w-medium)}
+  .cta-row{display:flex;flex-wrap:wrap;gap:13px;align-items:center}
+  .nice-btn{display:inline-flex;align-items:center;gap:9px;font-family:inherit;cursor:pointer;
+    letter-spacing:var(--track-tight);transition:.22s}
+  .nice-btn:hover{transform:translateY(-2px)}
+  a.nice-btn{box-shadow:0 12px 30px rgba(54,148,252,.36)}
+  .nice-btn--ghost{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.28);color:var(--nice-white)}
+  .nice-btn--ghost:hover{box-shadow:inset 0 0 0 1.5px var(--nice-blue);color:var(--nice-white)}
+  .smile{position:absolute;top:74px;right:8px;width:96px;height:96px;opacity:.95;
+    filter:drop-shadow(0 14px 30px rgba(2,90,251,.4));animation:float 6s ease-in-out infinite}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  @media(max-width:780px){.smile{width:64px;height:64px;top:80px;right:18px}}
 
   /* stats */
-  .stats{position:relative;z-index:1;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:56px 0 8px}
-  .stat{background:linear-gradient(180deg,var(--panel),var(--charcoal-2));border:1px solid var(--line);
-    border-radius:var(--radius);padding:22px 20px}
-  .stat .n{font-size:34px;font-weight:800;letter-spacing:-.02em;color:var(--white);line-height:1}
-  .stat .n small{font-size:18px;color:var(--blue);font-weight:700}
-  .stat .l{font-size:13px;color:var(--mut);margin-top:8px;font-weight:400}
+  .stats{position:relative;z-index:1;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:54px 0 4px}
+  .stat{background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:var(--radius-panel);padding:22px 20px}
+  .stat .n{font-weight:var(--w-semibold);font-size:36px;letter-spacing:var(--track-tighter);line-height:1;color:var(--nice-white)}
+  .stat .n small{font-size:19px;color:var(--nice-blue);font-weight:var(--w-semibold)}
+  .stat .l{font-size:13.5px;color:var(--mut);margin-top:9px;font-weight:var(--w-light)}
   @media(max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}}
 
   /* sections */
-  section{position:relative;z-index:1;padding:64px 0}
-  .eyebrow{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin-bottom:12px}
-  h2{font-size:clamp(27px,4vw,40px);font-weight:800;letter-spacing:-.022em;margin:0 0 14px;line-height:1.08}
-  .sub{color:var(--mut);font-size:16.5px;max-width:620px;font-weight:300;margin:0 0 36px}
+  section{position:relative;z-index:1;padding:60px 0}
+  .eyebrow{font-weight:var(--w-medium);font-size:13px;letter-spacing:.05em;color:var(--nice-blue);margin-bottom:12px}
+  h2{font-weight:var(--w-semibold);font-size:clamp(26px,3.6vw,40px);letter-spacing:var(--track-tight);
+    line-height:1.1;margin:0 0 14px}
+  .sub{color:var(--mut);font-size:16.5px;max-width:640px;font-weight:var(--w-light);margin:0 0 34px;letter-spacing:var(--track-tight)}
 
-  /* dataset card */
-  .data-card{background:linear-gradient(150deg,var(--panel-2),var(--charcoal-2));border:1px solid var(--line);
-    border-radius:24px;padding:34px;box-shadow:var(--shadow);position:relative;overflow:hidden}
-  .data-card::before{content:"";position:absolute;top:-40%;right:-10%;width:320px;height:320px;
-    background:radial-gradient(circle,rgba(54,148,252,.22),transparent 70%);pointer-events:none}
-  .file-name{display:inline-flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:15px;
-    background:var(--charcoal);border:1px solid var(--line);padding:10px 14px;border-radius:11px;color:var(--blue-soft);margin-bottom:18px}
-  .data-meta{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 24px}
-  .tag{font-size:12.5px;color:var(--mut);background:rgba(255,255,255,.05);border:1px solid var(--line);padding:6px 11px;border-radius:8px}
-  .tag.syn{color:var(--emerald);border-color:rgba(0,226,160,.3);background:rgba(0,226,160,.08)}
-  .dl-row{display:flex;flex-wrap:wrap;gap:12px}
-  .dl{display:inline-flex;align-items:center;gap:9px;font-size:14px;font-weight:500;padding:11px 16px;border-radius:11px;
-    background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--warm);transition:.2s}
-  .dl:hover{background:rgba(255,255,255,.09);transform:translateY(-1px);border-color:rgba(255,255,255,.2)}
-  .dl.big{background:var(--blue);color:#04101f;border-color:transparent;font-weight:600;box-shadow:0 12px 30px rgba(54,148,252,.4)}
-  .dl.big:hover{box-shadow:0 16px 36px rgba(54,148,252,.55)}
+  /* dataset card — warm-white squircle panel (the classic NiCE contrast) */
+  .data-card{background:var(--nice-warm-white);color:var(--nice-charcoal);border-radius:32px;
+    padding:38px;box-shadow:0 30px 70px rgba(0,0,0,.4);position:relative;overflow:hidden}
+  .file-name{display:inline-flex;align-items:center;gap:10px;font-family:'Be Vietnam Pro',monospace;font-weight:var(--w-medium);
+    font-size:15px;background:#fff;border:1px solid #e4e1d8;padding:10px 15px;border-radius:12px;color:var(--nice-blue-deep);margin-bottom:18px}
+  .file-name .ms{color:var(--nice-blue)}
+  .data-meta{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 26px}
+  .tag{font-size:13px;color:#56565f;background:#fff;border:1px solid #e4e1d8;padding:6px 13px;border-radius:var(--radius-pill);font-weight:var(--w-regular)}
+  .tag.syn{color:#0a7d5a;border-color:rgba(0,226,160,.5);background:rgba(0,226,160,.12)}
+  .dl-row{display:flex;flex-wrap:wrap;gap:11px;align-items:center}
+  .dl{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:var(--w-medium);padding:11px 17px;border-radius:var(--radius-pill);
+    background:#fff;border:1px solid #e0ddd3;color:var(--nice-charcoal);transition:.2s}
+  .dl .ms{color:var(--nice-blue);font-size:1.05em}
+  .dl:hover{transform:translateY(-1px);border-color:var(--nice-blue);box-shadow:0 6px 16px rgba(54,148,252,.18)}
+  .dl.big{background:var(--nice-blue);color:#fff;border-color:transparent;box-shadow:0 12px 28px rgba(54,148,252,.4)}
+  .dl.big .ms{color:#fff}
+  .dl.big:hover{box-shadow:0 16px 34px rgba(54,148,252,.55)}
 
   /* build chips */
   .chips{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:30px}
-  .chip{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 12px;text-align:center}
-  .chip .i{font-size:22px;display:block;margin-bottom:7px}
-  .chip .t{font-size:12.5px;color:var(--mut);font-weight:500;line-height:1.3}
+  .chip{background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:var(--radius-panel);padding:18px 12px;text-align:center}
+  .chip .ms{font-size:26px;color:var(--nice-blue);margin-bottom:9px}
+  .chip .t{font-size:12.5px;color:var(--mut);font-weight:var(--w-medium);line-height:1.32;display:block}
   @media(max-width:860px){.chips{grid-template-columns:repeat(3,1fr)}}
   @media(max-width:460px){.chips{grid-template-columns:repeat(2,1fr)}}
 
   /* step cards */
-  .step{background:linear-gradient(160deg,var(--panel),var(--charcoal-2));border:1px solid var(--line);
-    border-radius:22px;padding:30px;margin-bottom:22px;transition:.25s}
-  .step:hover{border-color:rgba(54,148,252,.4);transform:translateY(-2px)}
-  .step-head{display:flex;align-items:flex-start;gap:18px;margin-bottom:18px}
-  .num{flex:none;width:46px;height:46px;border-radius:13px;background:rgba(54,148,252,.13);border:1px solid rgba(54,148,252,.35);
-    display:grid;place-items:center;font-weight:800;font-size:20px;color:var(--blue-soft)}
-  .step-head h3{margin:0;font-size:21px;font-weight:700;letter-spacing:-.01em}
-  .step-head .meta{font-size:13px;color:var(--mut-2);margin-top:3px}
-  .goal{color:var(--mut);font-size:15px;margin:0 0 18px}
-  .goal b{color:var(--warm);font-weight:500}
-  .prompt-box{position:relative;background:#101019;border:1px solid var(--line);border-radius:14px;overflow:hidden}
-  .prompt-box .bar{display:flex;align-items:center;justify-content:space-between;padding:9px 12px 9px 15px;
+  .step{background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:24px;padding:30px;margin-bottom:20px;transition:.25s}
+  .step:hover{border-color:rgba(54,148,252,.45);transform:translateY(-2px)}
+  .step-head{display:flex;align-items:flex-start;gap:18px;margin-bottom:16px}
+  .num{flex:none;width:48px;height:48px;border-radius:16px;background:rgba(54,148,252,.14);border:1px solid rgba(54,148,252,.4);
+    display:grid;place-items:center;font-weight:var(--w-semibold);font-size:20px;color:var(--nice-blue-soft)}
+  .step-head h3{margin:0;font-weight:var(--w-semibold);font-size:21px;letter-spacing:var(--track-tight)}
+  .step-head .meta{font-size:13px;color:var(--mut-2);margin-top:4px;font-weight:var(--w-light);display:flex;align-items:center;gap:6px}
+  .step-head .meta .ms{font-size:15px;color:var(--nice-teal)}
+  .goal{color:var(--mut);font-size:15px;margin:0 0 18px;font-weight:var(--w-light)}
+  .goal b{color:var(--nice-white);font-weight:var(--w-medium)}
+  .prompt-box{background:#13131b;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .prompt-box .bar{display:flex;align-items:center;justify-content:space-between;padding:10px 12px 10px 16px;
     border-bottom:1px solid var(--line);background:rgba(255,255,255,.02)}
-  .prompt-box .bar .lbl{font-size:12px;color:var(--mut-2);font-family:'JetBrains Mono',monospace}
-  .copy-btn{display:inline-flex;align-items:center;gap:7px;font-family:inherit;font-size:13px;font-weight:600;
-    background:var(--blue);color:#04101f;border:none;padding:7px 14px;border-radius:9px;cursor:pointer;transition:.18s}
+  .prompt-box .bar .lbl{font-size:12px;color:var(--mut-2);font-weight:var(--w-medium);letter-spacing:.02em}
+  .copy-btn{display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-size:13px;font-weight:var(--w-medium);
+    background:var(--nice-blue);color:#fff;border:none;padding:8px 15px;border-radius:var(--radius-pill);cursor:pointer;transition:.18s}
+  .copy-btn .ms{font-size:16px}
   .copy-btn:hover{filter:brightness(1.08)}
-  .copy-btn.done{background:var(--emerald)}
-  pre.prompt{margin:0;padding:18px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.62;
-    color:#d9d9e4;white-space:pre-wrap;word-break:break-word;max-height:none}
-  .expect{margin:18px 0 0;font-size:14px;color:var(--mut)}
-  .expect b{color:var(--teal);font-weight:600}
-  .step-foot{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}
-  .mini{font-size:13px;color:var(--blue-soft);border:1px solid var(--line);padding:7px 13px;border-radius:9px;transition:.2s}
-  .mini:hover{background:rgba(54,148,252,.1);border-color:rgba(54,148,252,.4)}
-  .note{font-size:13.5px;color:var(--mut);background:rgba(54,148,252,.06);border:1px solid rgba(54,148,252,.22);
-    border-left:3px solid var(--blue);padding:12px 15px;border-radius:0 11px 11px 0;margin-top:16px}
+  .copy-btn.done{background:var(--nice-emerald);color:var(--nice-charcoal)}
+  pre.prompt{margin:0;padding:18px;font-family:'Be Vietnam Pro',ui-monospace,monospace;font-weight:var(--w-light);
+    font-size:13px;line-height:1.62;color:#d7d7e2;white-space:pre-wrap;word-break:break-word}
+  .expect{margin:16px 0 0;font-size:14px;color:var(--mut);font-weight:var(--w-light)}
+  .expect b{color:var(--nice-teal);font-weight:var(--w-medium)}
+  .step-foot{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
+  .mini{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:var(--w-medium);color:var(--nice-blue-soft);
+    border:1px solid var(--line);padding:8px 14px;border-radius:var(--radius-pill);transition:.2s}
+  .mini .ms{font-size:16px}
+  .mini:hover{background:rgba(54,148,252,.12);border-color:rgba(54,148,252,.45)}
+  .note{font-size:13.5px;color:var(--mut);background:rgba(54,148,252,.07);border:1px solid rgba(54,148,252,.24);
+    border-left:3px solid var(--nice-blue);padding:13px 16px;border-radius:0 12px 12px 0;margin-top:16px;font-weight:var(--w-light)}
+  .note b{color:var(--nice-white);font-weight:var(--w-medium)}
 
   /* how-to */
   .how{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-  .how-card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:26px}
-  .how-card h4{margin:0 0 6px;font-size:18px;font-weight:700}
-  .how-card .badge{font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--emerald);margin-bottom:10px;display:block}
-  .how-card p{margin:0;color:var(--mut);font-size:14.5px}
+  .how-card{background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:var(--radius-panel);padding:28px}
+  .how-card .hicon{width:46px;height:46px;border-radius:14px;background:var(--grad-blue-teal);display:grid;place-items:center;margin-bottom:16px}
+  .how-card .hicon .ms{color:#06131f;font-size:24px}
+  .how-card .badge{font-size:12px;font-weight:var(--w-medium);color:var(--nice-emerald);margin-bottom:7px;display:block;letter-spacing:.02em}
+  .how-card h4{margin:0 0 7px;font-weight:var(--w-semibold);font-size:18px;letter-spacing:var(--track-tight)}
+  .how-card p{margin:0;color:var(--mut);font-size:14.5px;font-weight:var(--w-light)}
+  .how-card code{background:rgba(255,255,255,.08);padding:2px 6px;border-radius:6px;font-size:13px;color:var(--nice-blue-soft)}
   @media(max-width:720px){.how{grid-template-columns:1fr}}
 
-  /* disclaimer + footer */
-  .disclaim{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:16px;padding:22px 24px;
-    color:var(--mut);font-size:14px;display:flex;gap:14px;align-items:flex-start}
-  .disclaim .i{font-size:20px}
-  footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:40px 0 56px;margin-top:48px}
-  .foot-in{display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between;align-items:center;color:var(--mut-2);font-size:13.5px}
-  .foot-links{display:flex;gap:18px;flex-wrap:wrap}
-  .foot-links a{color:var(--mut)}.foot-links a:hover{color:var(--blue)}
+  .disclaim{display:flex;gap:14px;align-items:flex-start;margin-top:24px;background:rgba(255,255,255,.03);
+    border:1px solid var(--line);border-radius:var(--radius-panel);padding:22px 24px;color:var(--mut);font-size:14px;font-weight:var(--w-light)}
+  .disclaim .ms{color:var(--nice-teal);font-size:22px;flex:none}
+  .disclaim b{color:var(--nice-white);font-weight:var(--w-medium)}
+
+  /* final CTA — signature gradient panel */
+  .final{background:var(--grad-signature);color:#fff;border-radius:32px;padding:48px 38px;text-align:center;box-shadow:0 30px 70px rgba(2,90,251,.35)}
+  .final h2{color:#fff}
+  .final .sub{color:rgba(255,255,255,.86);margin:0 auto 26px}
+  .final .dl-row{justify-content:center}
+  .final .dl{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.32);color:#fff;backdrop-filter:blur(6px)}
+  .final .dl .ms{color:#fff}
+  .final .dl:hover{background:rgba(255,255,255,.26);border-color:#fff}
+  .final .dl.big{background:#fff;color:var(--nice-blue-deep)}
+  .final .dl.big .ms{color:var(--nice-blue-deep)}
+
+  /* footer */
+  footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:46px 0 56px;margin-top:46px}
+  .foot-in{display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:center}
+  .foot-in img.tag{height:74px;width:auto;opacity:.95}
+  .foot-right{text-align:right}
+  .foot-links{display:flex;gap:18px;flex-wrap:wrap;justify-content:flex-end;margin-bottom:8px}
+  .foot-links a{color:var(--mut);font-size:13.5px;font-weight:var(--w-medium)}
+  .foot-links a:hover{color:var(--nice-blue)}
+  .foot-fine{color:var(--mut-2);font-size:12.5px;font-weight:var(--w-light)}
+  @media(max-width:620px){.foot-in{flex-direction:column;align-items:flex-start}.foot-right{text-align:left}.foot-links{justify-content:flex-start}}
+
   .reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
   .reveal.in{opacity:1;transform:none}
 </style>
@@ -171,24 +188,29 @@
 
 <nav>
   <div class="wrap nav-in">
-    <a class="brand" href="#top"><span class="logo-dot">Cx</span> <b>CXone</b>&nbsp;Churn&nbsp;<span>Lab</span></a>
+    <a class="brand" href="#top">
+      <img src="assets/cxone-logo.svg" alt="NiCE CXone" />
+      <span class="div"></span>
+      <span class="lab">Churn Lab</span>
+    </a>
     <div class="nav-links">
       <a href="#dataset">Dataset</a>
       <a href="#steps">The 6 steps</a>
       <a href="#how">How to use</a>
-      <a class="ghub" id="repoNav" href="#download">⬇ Download</a>
+      <a class="nice-btn dl" href="#download"><span class="ms">download</span> Download</a>
     </div>
   </div>
 </nav>
 
 <header id="top">
-  <div class="wrap">
-    <span class="pill"><span class="d"></span> Hands-on AI lab · 100% synthetic data · free</span>
-    <h1>From <span class="hl">data</span> to decision,<br/>with Claude.</h1>
+  <div class="wrap" style="position:relative">
+    <img class="smile" src="assets/smile.svg" alt="" aria-hidden="true" />
+    <span class="eyepill"><span class="d"></span> Hands-on AI lab · 100% synthetic data · free</span>
+    <h1 class="hero">From <span class="nice-hl nice-hl--blue">data</span> to decision, with Claude.</h1>
     <p class="lead">Download a realistic (but completely made-up) <b>NiCE CXone</b> customer dataset, then follow six copy-paste prompts to turn raw rows into <b>insights, a landing page, a working MVP, and a management deck</b>. No coding. No data background. Just copy, paste, and watch.</p>
     <div class="cta-row">
-      <a class="btn btn-primary" href="data/nice_cxone_churn.csv" download>⬇ Download the dataset (CSV)</a>
-      <a class="btn btn-ghost" href="#steps">Start the lab →</a>
+      <a class="nice-btn" href="data/nice_cxone_churn.csv" download><span class="ms">download</span> Download the dataset</a>
+      <a class="nice-btn nice-btn--ghost" href="#steps">Start the lab <span class="ms">arrow_forward</span></a>
     </div>
 
     <div class="stats">
@@ -208,29 +230,29 @@
     <p class="sub">Each row is one NiCE CXone customer — their contract, product usage, support history, and whether they stayed or left. We planted real, discoverable patterns (and a few deliberate data-quality traps) so there's something worth finding.</p>
 
     <div class="data-card">
-      <span class="file-name">📄 nice_cxone_churn.csv</span>
+      <span class="file-name"><span class="ms">description</span> nice_cxone_churn.csv</span>
       <div class="data-meta">
         <span class="tag">1,001 rows</span>
         <span class="tag">40 columns</span>
         <span class="tag">~21% churned</span>
         <span class="tag syn">✓ synthetic — safe to share</span>
       </div>
-      <div class="dl-row" id="downloadDls">
-        <a class="dl big" href="data/nice_cxone_churn.csv" download>⬇ Download CSV</a>
-        <a class="dl" href="download/nice-cxone-churn-lab.zip" download>📦 Download everything (ZIP)</a>
-        <a class="dl" href="data/DATA_DICTIONARY.md" download>📖 column dictionary</a>
-        <a class="dl" href="prompts/ALL_PROMPTS.md" download>📋 all prompts (.md)</a>
-        <a class="dl" href="data/generate_dataset.py" download>🐍 the generator</a>
+      <div class="dl-row">
+        <a class="dl big" href="data/nice_cxone_churn.csv" download><span class="ms">download</span> Download CSV</a>
+        <a class="dl" href="download/nice-cxone-churn-lab.zip" download><span class="ms">folder_zip</span> Everything (ZIP)</a>
+        <a class="dl" href="data/DATA_DICTIONARY.md" download><span class="ms">menu_book</span> Column dictionary</a>
+        <a class="dl" href="prompts/ALL_PROMPTS.md" download><span class="ms">content_paste</span> All prompts</a>
+        <a class="dl" href="data/generate_dataset.py" download><span class="ms">code</span> The generator</a>
       </div>
     </div>
 
     <div class="chips">
-      <div class="chip"><span class="i">🔎</span><span class="t">Look at the data</span></div>
-      <div class="chip"><span class="i">🧪</span><span class="t">Find the insights</span></div>
-      <div class="chip"><span class="i">🎨</span><span class="t">Build a landing page</span></div>
-      <div class="chip"><span class="i">⚔️</span><span class="t">Scout competitors</span></div>
-      <div class="chip"><span class="i">🚀</span><span class="t">Ship an MVP</span></div>
-      <div class="chip"><span class="i">📊</span><span class="t">Pitch leadership</span></div>
+      <div class="chip"><span class="ms">search</span><span class="t">Look at the data</span></div>
+      <div class="chip"><span class="ms">query_stats</span><span class="t">Find the insights</span></div>
+      <div class="chip"><span class="ms">web</span><span class="t">Build a landing page</span></div>
+      <div class="chip"><span class="ms">compare_arrows</span><span class="t">Scout competitors</span></div>
+      <div class="chip"><span class="ms">rocket_launch</span><span class="t">Ship an MVP</span></div>
+      <div class="chip"><span class="ms">co_present</span><span class="t">Pitch leadership</span></div>
     </div>
   </div>
 </section>
@@ -241,7 +263,7 @@
     <div class="reveal">
       <div class="eyebrow">The lab</div>
       <h2>Six steps. Six prompts. Copy, paste, go.</h2>
-      <p class="sub">Do them in order — each builds on the last, so keep the same Claude chat open. Hit <b>Copy</b>, paste into Claude, and (for steps 1–2) attach the CSV you downloaded above.</p>
+      <p class="sub">Do them in order — each builds on the last, so keep the same Claude chat open. Hit copy, paste into Claude, and (for steps 1–2) attach the CSV you downloaded above.</p>
     </div>
     <div id="stepList"></div>
   </div>
@@ -255,34 +277,36 @@
     <p class="sub">You just need a Claude account. Pick whichever feels comfortable — the prompts are identical.</p>
     <div class="how">
       <div class="how-card">
+        <div class="hicon"><span class="ms">language</span></div>
         <span class="badge">Easiest</span>
         <h4>Claude.ai (in your browser)</h4>
-        <p>Go to claude.ai, start a new chat, click the 📎 paperclip to upload <code>nice_cxone_churn.csv</code>, then paste the Step 1 prompt. That's it.</p>
+        <p>Go to claude.ai, start a new chat, click the paperclip to upload <code>nice_cxone_churn.csv</code>, then paste the Step 1 prompt. That's it.</p>
       </div>
       <div class="how-card">
+        <div class="hicon"><span class="ms">terminal</span></div>
         <span class="badge">For terminal folks</span>
         <h4>Claude Code (desktop / CLI)</h4>
         <p>Unzip the lab into a folder, open Claude Code there, and just mention the file by name — Claude can read everything in the folder. No uploading needed.</p>
       </div>
     </div>
-    <div class="disclaim" style="margin-top:24px">
-      <span class="i">🧪</span>
-      <div><b style="color:var(--warm)">A note on the data.</b> Everything in this dataset is invented for teaching. The patterns are real <i>inside the file</i> — they are <b>not</b> real NiCE business facts. Use the outputs to practice the workflow, not to make actual decisions.</div>
+    <div class="disclaim">
+      <span class="ms">science</span>
+      <div><b>A note on the data.</b> Everything in this dataset is invented for teaching. The patterns are real <i>inside the file</i> — they are <b>not</b> real NiCE business facts. Use the outputs to practice the workflow, not to make actual decisions.</div>
     </div>
   </div>
 </section>
 
-<!-- DOWNLOAD anchor -->
-<section id="download" style="padding-top:8px">
+<!-- DOWNLOAD -->
+<section id="download">
   <div class="wrap reveal">
-    <div class="data-card" style="text-align:center">
-      <h2 style="margin-bottom:10px">Grab everything and go.</h2>
-      <p class="sub" style="margin:0 auto 24px">The dataset, all six prompts, the setup guide, the glossary, and the brand cheat-sheet — one zip.</p>
-      <div class="dl-row" style="justify-content:center">
-        <a class="dl big" href="download/nice-cxone-churn-lab.zip" download>📦 Download the full lab (ZIP)</a>
-        <a class="dl" href="data/nice_cxone_churn.csv" download>⬇ Just the CSV</a>
-        <a class="dl" href="SETUP.md" download>📖 Setup guide</a>
-        <a class="dl" href="GLOSSARY.md" download>📚 Glossary</a>
+    <div class="final">
+      <h2>Grab everything and go.</h2>
+      <p class="sub">The dataset, all six prompts, the setup guide, the glossary, and the brand cheat-sheet — one zip.</p>
+      <div class="dl-row">
+        <a class="dl big" href="download/nice-cxone-churn-lab.zip" download><span class="ms">folder_zip</span> Download the full lab (ZIP)</a>
+        <a class="dl" href="data/nice_cxone_churn.csv" download><span class="ms">download</span> Just the CSV</a>
+        <a class="dl" href="SETUP.md" download><span class="ms">menu_book</span> Setup guide</a>
+        <a class="dl" href="GLOSSARY.md" download><span class="ms">school</span> Glossary</a>
       </div>
     </div>
   </div>
@@ -290,13 +314,16 @@
 
 <footer>
   <div class="wrap foot-in">
-    <div>Built as a hands-on Claude lab · data is 100% synthetic</div>
-    <div class="foot-links">
-      <a href="#top">Top</a>
-      <a href="data/nice_cxone_churn.csv" download>CSV</a>
-      <a href="prompts/ALL_PROMPTS.md" download>All prompts</a>
-      <a href="GLOSSARY.md" download>Glossary</a>
-      <a href="reference/NICE_BRAND_CHEATSHEET.md" download>Brand cheat-sheet</a>
+    <img class="tag" src="assets/tagline.svg" alt="Create a NiCE world" />
+    <div class="foot-right">
+      <div class="foot-links">
+        <a href="#top">Top</a>
+        <a href="data/nice_cxone_churn.csv" download>CSV</a>
+        <a href="prompts/ALL_PROMPTS.md" download>All prompts</a>
+        <a href="GLOSSARY.md" download>Glossary</a>
+        <a href="reference/NICE_BRAND_CHEATSHEET.md" download>Brand cheat-sheet</a>
+      </div>
+      <div class="foot-fine">A hands-on Claude lab · data is 100% synthetic · NiCE CXone</div>
     </div>
   </div>
 </footer>
@@ -447,21 +474,21 @@ STEPS.forEach((s, idx) => {
   const pre = document.createElement('pre');
   pre.className = 'prompt';
   pre.textContent = s.prompt;            // textContent => exact characters, no escaping bugs
-  const noteHtml = s.note ? `<div class="note">💡 ${s.note}</div>` : '';
+  const noteHtml = s.note ? `<div class="note"><b>No skill?</b> ${s.note}</div>` : '';
   card.innerHTML = `
     <div class="step-head">
       <div class="num">${s.n}</div>
-      <div><h3>${s.title}</h3><div class="meta">${s.time}</div></div>
+      <div><h3>${s.title}</h3><div class="meta"><span class="ms">schedule</span>${s.time}</div></div>
     </div>
     <p class="goal">${s.goal}</p>
     <div class="prompt-box">
-      <div class="bar"><span class="lbl">prompt — paste into Claude</span>
-        <button class="copy-btn" data-i="${idx}">⧉ Copy</button></div>
+      <div class="bar"><span class="lbl">Prompt — paste into Claude</span>
+        <button class="copy-btn" data-i="${idx}"><span class="ms">content_copy</span> Copy</button></div>
     </div>
     ${noteHtml}
     <p class="expect"><b>What you'll get →</b> ${s.expect}</p>
     <div class="step-foot">
-      <a class="mini" href="${s.file}" download>📄 Full step guide</a>
+      <a class="mini" href="${s.file}" download><span class="ms">description</span> Full step guide</a>
     </div>`;
   card.querySelector('.prompt-box').appendChild(pre);
   list.appendChild(card);
@@ -472,14 +499,10 @@ document.addEventListener('click', async (e) => {
   const btn = e.target.closest('.copy-btn');
   if(!btn) return;
   const text = STEPS[+btn.dataset.i].prompt;
-  try{
-    await navigator.clipboard.writeText(text);
-  }catch(err){
-    const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);
-    ta.select();document.execCommand('copy');ta.remove();
-  }
+  try{ await navigator.clipboard.writeText(text); }
+  catch(err){ const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove(); }
   const old = btn.innerHTML;
-  btn.classList.add('done'); btn.innerHTML='✓ Copied!';
+  btn.classList.add('done'); btn.innerHTML='<span class="ms">check</span> Copied!';
   setTimeout(()=>{btn.classList.remove('done');btn.innerHTML=old;}, 1700);
 });
 
