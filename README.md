@@ -1,6 +1,6 @@
 # 🐆 CXone Churn Lab — live site
 
-**▶ Live:** https://hoodini.github.io/cxone-churn-lab/
+**▶ Live:** https://cxone-lab.yuv.ai/
 
 A hands-on, beginner-friendly Claude lab. Download a (synthetic) **NiCE CXone** customer dataset and
 follow six copy-paste prompts to go from raw data → insights → a landing page → a working MVP →
@@ -10,7 +10,7 @@ This repo is the **public web app** (served free via GitHub Pages). Everything a
 downloadable straight from the site.
 
 ## Quick links
-- 🌐 **Open the lab:** https://hoodini.github.io/cxone-churn-lab/
+- 🌐 **Open the lab:** https://cxone-lab.yuv.ai/
 - ⬇ **The dataset:** [`data/nice_cxone_churn.csv`](data/nice_cxone_churn.csv) (1,001 rows × 40 columns, synthetic)
 - 📋 **All prompts:** [`prompts/ALL_PROMPTS.md`](prompts/ALL_PROMPTS.md)
 - 📦 **Everything in one zip:** [`download/nice-cxone-churn-lab.zip`](download/nice-cxone-churn-lab.zip)
