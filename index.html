@@ -5,10 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>NiCE CXone Churn Lab — from data to decision with Claude</title>
 <meta name="description" content="A hands-on Claude lab from NiCE CXone. Download a synthetic customer dataset and use copy-paste prompts to go from raw data to insights, a landing page, an MVP, and a management deck." />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap" rel="stylesheet" />
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
+<!-- All fonts self-hosted (Be Vietnam Pro + Material Symbols) — no external CDN dependency -->
+<link href="assets/fonts.css" rel="stylesheet" />
 <link href="assets/nice-brand.css" rel="stylesheet" />
 <style>
   /* ---- supplemental layout, built on the NiCE design tokens ---- */
@@ -22,7 +20,8 @@
   ::selection{background:var(--nice-blue);color:#fff}
   .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
   .ms{font-family:'Material Symbols Rounded';font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;
-    font-size:1.15em;line-height:1;vertical-align:-.18em;display:inline-block}
+    font-feature-settings:'liga';-webkit-font-feature-settings:'liga';font-size:1.15em;line-height:1;
+    vertical-align:-.18em;display:inline-block}
 
   .bg-glow{position:fixed;inset:0;z-index:0;pointer-events:none;
     background:

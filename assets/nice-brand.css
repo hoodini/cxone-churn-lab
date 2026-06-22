@@ -5,8 +5,7 @@
    Spelling rule: always "NiCE" (capital N, C, E + lowercase i). No exceptions.
    ============================================================================ */
 
-/* Brand typeface: Be Vietnam Pro (free Google font). Official system fallback: Arial. */
-@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap');
+/* Brand typeface: Be Vietnam Pro — self-hosted locally via assets/fonts.css (no Google CDN dependency). */
 
 :root {
   /* --- PRIMARY PALETTE --------------------------------------------------- */
@@ -30,7 +29,7 @@
   --nice-pink-soft:   #f3b1c4;
 
   /* --- TYPOGRAPHY -------------------------------------------------------- */
-  --nice-font: 'Be Vietnam Pro', Arial, system-ui, sans-serif;
+  --nice-font: 'Be Vietnam Pro', Helvetica, Arial, sans-serif;
   --w-light: 300;     /* body copy */
   --w-regular: 400;   /* feature copy */
   --w-medium: 500;    /* labels */
