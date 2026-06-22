@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CXone Churn Lab — from data to decision with Claude</title>
+<meta name="description" content="A hands-on, beginner-friendly Claude lab. Download a synthetic NiCE CXone customer dataset and use copy-paste prompts to go from raw data to insights, a landing page, an MVP, and a management deck." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --charcoal:#16161d;
+    --charcoal-2:#1c1c26;
+    --panel:#21212b;
+    --panel-2:#262633;
+    --blue:#3694fc;
+    --blue-soft:#6fb2ff;
+    --emerald:#00e2a0;
+    --teal:#36ead0;
+    --warm:#f2f0eb;
+    --white:#ffffff;
+    --mut:#a7a7b4;
+    --mut-2:#7c7c8a;
+    --line:rgba(255,255,255,.09);
+    --radius:18px;
+    --shadow:0 24px 60px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;font-family:'Be Vietnam Pro',Arial,sans-serif;background:var(--charcoal);
+    color:var(--white);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none}
+  ::selection{background:var(--blue);color:#fff}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+  /* glow background */
+  .bg-glow{position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(50% 40% at 15% 0%, rgba(54,148,252,.20), transparent 60%),
+      radial-gradient(40% 35% at 90% 10%, rgba(0,226,160,.12), transparent 60%),
+      radial-gradient(45% 45% at 50% 100%, rgba(54,148,252,.10), transparent 60%);
+  }
+
+  /* nav */
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);
+    background:rgba(22,22,29,.72);border-bottom:1px solid var(--line)}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:700;letter-spacing:-.01em}
+  .logo-dot{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--blue),var(--teal));
+    display:grid;place-items:center;font-weight:800;color:#06131f;font-size:15px;box-shadow:0 6px 18px rgba(54,148,252,.4)}
+  .brand b{color:var(--white)}.brand span{color:var(--blue)}
+  .nav-links{display:flex;gap:8px;align-items:center}
+  .nav-links a{font-size:14px;color:var(--mut);padding:8px 12px;border-radius:10px;transition:.2s}
+  .nav-links a:hover{color:var(--white);background:rgba(255,255,255,.05)}
+  .nav-links .ghub{border:1px solid var(--line)}
+  @media(max-width:720px){.nav-links a:not(.ghub){display:none}}
+
+  /* hero */
+  header{position:relative;z-index:1;padding:88px 0 64px}
+  .pill{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--teal);
+    background:rgba(0,226,160,.10);border:1px solid rgba(0,226,160,.28);padding:7px 13px;border-radius:999px;margin-bottom:24px}
+  .pill .d{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 10px var(--teal)}
+  h1{font-size:clamp(38px,6.4vw,68px);line-height:1.03;font-weight:800;letter-spacing:-.025em;margin:0 0 20px}
+  .hl{position:relative;white-space:nowrap}
+  .hl::after{content:"";position:absolute;left:-6px;right:-6px;top:6%;bottom:6%;background:var(--blue);
+    border-radius:14px 14px 14px 4px;z-index:-1;opacity:.92}
+  .lead{font-size:clamp(17px,2.2vw,21px);color:var(--mut);max-width:640px;margin:0 0 34px;font-weight:300}
+  .lead b{color:var(--warm);font-weight:500}
+  .cta-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+  .btn{display:inline-flex;align-items:center;gap:10px;font-family:inherit;font-size:15px;font-weight:600;
+    padding:14px 22px;border-radius:13px;border:1px solid transparent;cursor:pointer;transition:.22s;text-align:center}
+  .btn-primary{background:var(--blue);color:#04101f;box-shadow:0 14px 34px rgba(54,148,252,.42)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 20px 44px rgba(54,148,252,.55)}
+  .btn-ghost{background:rgba(255,255,255,.04);border-color:var(--line);color:var(--white)}
+  .btn-ghost:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.2)}
+
+  /* stats */
+  .stats{position:relative;z-index:1;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:56px 0 8px}
+  .stat{background:linear-gradient(180deg,var(--panel),var(--charcoal-2));border:1px solid var(--line);
+    border-radius:var(--radius);padding:22px 20px}
+  .stat .n{font-size:34px;font-weight:800;letter-spacing:-.02em;color:var(--white);line-height:1}
+  .stat .n small{font-size:18px;color:var(--blue);font-weight:700}
+  .stat .l{font-size:13px;color:var(--mut);margin-top:8px;font-weight:400}
+  @media(max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+  /* sections */
+  section{position:relative;z-index:1;padding:64px 0}
+  .eyebrow{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin-bottom:12px}
+  h2{font-size:clamp(27px,4vw,40px);font-weight:800;letter-spacing:-.022em;margin:0 0 14px;line-height:1.08}
+  .sub{color:var(--mut);font-size:16.5px;max-width:620px;font-weight:300;margin:0 0 36px}
+
+  /* dataset card */
+  .data-card{background:linear-gradient(150deg,var(--panel-2),var(--charcoal-2));border:1px solid var(--line);
+    border-radius:24px;padding:34px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .data-card::before{content:"";position:absolute;top:-40%;right:-10%;width:320px;height:320px;
+    background:radial-gradient(circle,rgba(54,148,252,.22),transparent 70%);pointer-events:none}
+  .file-name{display:inline-flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:15px;
+    background:var(--charcoal);border:1px solid var(--line);padding:10px 14px;border-radius:11px;color:var(--blue-soft);margin-bottom:18px}
+  .data-meta{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 24px}
+  .tag{font-size:12.5px;color:var(--mut);background:rgba(255,255,255,.05);border:1px solid var(--line);padding:6px 11px;border-radius:8px}
+  .tag.syn{color:var(--emerald);border-color:rgba(0,226,160,.3);background:rgba(0,226,160,.08)}
+  .dl-row{display:flex;flex-wrap:wrap;gap:12px}
+  .dl{display:inline-flex;align-items:center;gap:9px;font-size:14px;font-weight:500;padding:11px 16px;border-radius:11px;
+    background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--warm);transition:.2s}
+  .dl:hover{background:rgba(255,255,255,.09);transform:translateY(-1px);border-color:rgba(255,255,255,.2)}
+  .dl.big{background:var(--blue);color:#04101f;border-color:transparent;font-weight:600;box-shadow:0 12px 30px rgba(54,148,252,.4)}
+  .dl.big:hover{box-shadow:0 16px 36px rgba(54,148,252,.55)}
+
+  /* build chips */
+  .chips{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:30px}
+  .chip{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 12px;text-align:center}
+  .chip .i{font-size:22px;display:block;margin-bottom:7px}
+  .chip .t{font-size:12.5px;color:var(--mut);font-weight:500;line-height:1.3}
+  @media(max-width:860px){.chips{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:460px){.chips{grid-template-columns:repeat(2,1fr)}}
+
+  /* step cards */
+  .step{background:linear-gradient(160deg,var(--panel),var(--charcoal-2));border:1px solid var(--line);
+    border-radius:22px;padding:30px;margin-bottom:22px;transition:.25s}
+  .step:hover{border-color:rgba(54,148,252,.4);transform:translateY(-2px)}
+  .step-head{display:flex;align-items:flex-start;gap:18px;margin-bottom:18px}
+  .num{flex:none;width:46px;height:46px;border-radius:13px;background:rgba(54,148,252,.13);border:1px solid rgba(54,148,252,.35);
+    display:grid;place-items:center;font-weight:800;font-size:20px;color:var(--blue-soft)}
+  .step-head h3{margin:0;font-size:21px;font-weight:700;letter-spacing:-.01em}
+  .step-head .meta{font-size:13px;color:var(--mut-2);margin-top:3px}
+  .goal{color:var(--mut);font-size:15px;margin:0 0 18px}
+  .goal b{color:var(--warm);font-weight:500}
+  .prompt-box{position:relative;background:#101019;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .prompt-box .bar{display:flex;align-items:center;justify-content:space-between;padding:9px 12px 9px 15px;
+    border-bottom:1px solid var(--line);background:rgba(255,255,255,.02)}
+  .prompt-box .bar .lbl{font-size:12px;color:var(--mut-2);font-family:'JetBrains Mono',monospace}
+  .copy-btn{display:inline-flex;align-items:center;gap:7px;font-family:inherit;font-size:13px;font-weight:600;
+    background:var(--blue);color:#04101f;border:none;padding:7px 14px;border-radius:9px;cursor:pointer;transition:.18s}
+  .copy-btn:hover{filter:brightness(1.08)}
+  .copy-btn.done{background:var(--emerald)}
+  pre.prompt{margin:0;padding:18px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.62;
+    color:#d9d9e4;white-space:pre-wrap;word-break:break-word;max-height:none}
+  .expect{margin:18px 0 0;font-size:14px;color:var(--mut)}
+  .expect b{color:var(--teal);font-weight:600}
+  .step-foot{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}
+  .mini{font-size:13px;color:var(--blue-soft);border:1px solid var(--line);padding:7px 13px;border-radius:9px;transition:.2s}
+  .mini:hover{background:rgba(54,148,252,.1);border-color:rgba(54,148,252,.4)}
+  .note{font-size:13.5px;color:var(--mut);background:rgba(54,148,252,.06);border:1px solid rgba(54,148,252,.22);
+    border-left:3px solid var(--blue);padding:12px 15px;border-radius:0 11px 11px 0;margin-top:16px}
+
+  /* how-to */
+  .how{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .how-card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:26px}
+  .how-card h4{margin:0 0 6px;font-size:18px;font-weight:700}
+  .how-card .badge{font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--emerald);margin-bottom:10px;display:block}
+  .how-card p{margin:0;color:var(--mut);font-size:14.5px}
+  @media(max-width:720px){.how{grid-template-columns:1fr}}
+
+  /* disclaimer + footer */
+  .disclaim{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:16px;padding:22px 24px;
+    color:var(--mut);font-size:14px;display:flex;gap:14px;align-items:flex-start}
+  .disclaim .i{font-size:20px}
+  footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:40px 0 56px;margin-top:48px}
+  .foot-in{display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between;align-items:center;color:var(--mut-2);font-size:13.5px}
+  .foot-links{display:flex;gap:18px;flex-wrap:wrap}
+  .foot-links a{color:var(--mut)}.foot-links a:hover{color:var(--blue)}
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+<div class="bg-glow"></div>
+
+<nav>
+  <div class="wrap nav-in">
+    <a class="brand" href="#top"><span class="logo-dot">Cx</span> <b>CXone</b>&nbsp;Churn&nbsp;<span>Lab</span></a>
+    <div class="nav-links">
+      <a href="#dataset">Dataset</a>
+      <a href="#steps">The 6 steps</a>
+      <a href="#how">How to use</a>
+      <a class="ghub" id="repoNav" href="#download">⬇ Download</a>
+    </div>
+  </div>
+</nav>
+
+<header id="top">
+  <div class="wrap">
+    <span class="pill"><span class="d"></span> Hands-on AI lab · 100% synthetic data · free</span>
+    <h1>From <span class="hl">data</span> to decision,<br/>with Claude.</h1>
+    <p class="lead">Download a realistic (but completely made-up) <b>NiCE CXone</b> customer dataset, then follow six copy-paste prompts to turn raw rows into <b>insights, a landing page, a working MVP, and a management deck</b>. No coding. No data background. Just copy, paste, and watch.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="data/nice_cxone_churn.csv" download>⬇ Download the dataset (CSV)</a>
+      <a class="btn btn-ghost" href="#steps">Start the lab →</a>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="n" data-to="1001">0</div><div class="l">customer rows</div></div>
+      <div class="stat"><div class="n" data-to="40">0</div><div class="l">columns to explore</div></div>
+      <div class="stat"><div class="n"><span data-to="21">0</span><small>%</small></div><div class="l">churn to explain</div></div>
+      <div class="stat"><div class="n" data-to="6">0</div><div class="l">copy-paste steps</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- DATASET -->
+<section id="dataset">
+  <div class="wrap reveal">
+    <div class="eyebrow">The data</div>
+    <h2>One file. A whole story hiding inside.</h2>
+    <p class="sub">Each row is one NiCE CXone customer — their contract, product usage, support history, and whether they stayed or left. We planted real, discoverable patterns (and a few deliberate data-quality traps) so there's something worth finding.</p>
+
+    <div class="data-card">
+      <span class="file-name">📄 nice_cxone_churn.csv</span>
+      <div class="data-meta">
+        <span class="tag">1,001 rows</span>
+        <span class="tag">40 columns</span>
+        <span class="tag">~21% churned</span>
+        <span class="tag syn">✓ synthetic — safe to share</span>
+      </div>
+      <div class="dl-row" id="downloadDls">
+        <a class="dl big" href="data/nice_cxone_churn.csv" download>⬇ Download CSV</a>
+        <a class="dl" href="download/nice-cxone-churn-lab.zip" download>📦 Download everything (ZIP)</a>
+        <a class="dl" href="data/DATA_DICTIONARY.md" download>📖 column dictionary</a>
+        <a class="dl" href="prompts/ALL_PROMPTS.md" download>📋 all prompts (.md)</a>
+        <a class="dl" href="data/generate_dataset.py" download>🐍 the generator</a>
+      </div>
+    </div>
+
+    <div class="chips">
+      <div class="chip"><span class="i">🔎</span><span class="t">Look at the data</span></div>
+      <div class="chip"><span class="i">🧪</span><span class="t">Find the insights</span></div>
+      <div class="chip"><span class="i">🎨</span><span class="t">Build a landing page</span></div>
+      <div class="chip"><span class="i">⚔️</span><span class="t">Scout competitors</span></div>
+      <div class="chip"><span class="i">🚀</span><span class="t">Ship an MVP</span></div>
+      <div class="chip"><span class="i">📊</span><span class="t">Pitch leadership</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- STEPS -->
+<section id="steps">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="eyebrow">The lab</div>
+      <h2>Six steps. Six prompts. Copy, paste, go.</h2>
+      <p class="sub">Do them in order — each builds on the last, so keep the same Claude chat open. Hit <b>Copy</b>, paste into Claude, and (for steps 1–2) attach the CSV you downloaded above.</p>
+    </div>
+    <div id="stepList"></div>
+  </div>
+</section>
+
+<!-- HOW TO -->
+<section id="how">
+  <div class="wrap reveal">
+    <div class="eyebrow">First time?</div>
+    <h2>Two easy ways to do this.</h2>
+    <p class="sub">You just need a Claude account. Pick whichever feels comfortable — the prompts are identical.</p>
+    <div class="how">
+      <div class="how-card">
+        <span class="badge">Easiest</span>
+        <h4>Claude.ai (in your browser)</h4>
+        <p>Go to claude.ai, start a new chat, click the 📎 paperclip to upload <code>nice_cxone_churn.csv</code>, then paste the Step 1 prompt. That's it.</p>
+      </div>
+      <div class="how-card">
+        <span class="badge">For terminal folks</span>
+        <h4>Claude Code (desktop / CLI)</h4>
+        <p>Unzip the lab into a folder, open Claude Code there, and just mention the file by name — Claude can read everything in the folder. No uploading needed.</p>
+      </div>
+    </div>
+    <div class="disclaim" style="margin-top:24px">
+      <span class="i">🧪</span>
+      <div><b style="color:var(--warm)">A note on the data.</b> Everything in this dataset is invented for teaching. The patterns are real <i>inside the file</i> — they are <b>not</b> real NiCE business facts. Use the outputs to practice the workflow, not to make actual decisions.</div>
+    </div>
+  </div>
+</section>
+
+<!-- DOWNLOAD anchor -->
+<section id="download" style="padding-top:8px">
+  <div class="wrap reveal">
+    <div class="data-card" style="text-align:center">
+      <h2 style="margin-bottom:10px">Grab everything and go.</h2>
+      <p class="sub" style="margin:0 auto 24px">The dataset, all six prompts, the setup guide, the glossary, and the brand cheat-sheet — one zip.</p>
+      <div class="dl-row" style="justify-content:center">
+        <a class="dl big" href="download/nice-cxone-churn-lab.zip" download>📦 Download the full lab (ZIP)</a>
+        <a class="dl" href="data/nice_cxone_churn.csv" download>⬇ Just the CSV</a>
+        <a class="dl" href="SETUP.md" download>📖 Setup guide</a>
+        <a class="dl" href="GLOSSARY.md" download>📚 Glossary</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-in">
+    <div>Built as a hands-on Claude lab · data is 100% synthetic</div>
+    <div class="foot-links">
+      <a href="#top">Top</a>
+      <a href="data/nice_cxone_churn.csv" download>CSV</a>
+      <a href="prompts/ALL_PROMPTS.md" download>All prompts</a>
+      <a href="GLOSSARY.md" download>Glossary</a>
+      <a href="reference/NICE_BRAND_CHEATSHEET.md" download>Brand cheat-sheet</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ---- the six prompts, verbatim (single source of truth for display + copy) ---- */
+const STEPS = [
+  {
+    n:1, title:"Look at the data", time:"~5 min · attach the CSV",
+    goal:"Get Claude to explain what's in the file in plain English — no analysis yet.",
+    expect:"A column-by-column tour, 5 example rows, and what one row represents.",
+    file:"lab/STEP-1-look-at-the-data.md",
+    prompt:`I'm sharing a CSV file called nice_cxone_churn.csv. It's a (synthetic) customer dataset for
+NiCE CXone, the cloud contact-center platform — each row is one customer company, and the data
+covers their contract, product usage, support history, and whether they churned (left) or are
+still active.
+
+Before any analysis, just help me understand what I'm looking at:
+1. How many rows and how many columns are there?
+2. List every column with a short, plain-English explanation of what it means.
+3. Show me 5 example rows in a readable table.
+4. In one sentence, what does a single row represent?
+
+Don't look for patterns or insights yet — I only want to understand the shape of the data.
+Explain it like I'm new to data analysis.`
+  },
+  {
+    n:2, title:"Analyze the data and find the gaps", time:"~15 min · attach the CSV",
+    goal:"The heart of the lab — data-quality problems, the churn story, the drivers, and the surprises.",
+    expect:"Counted data flaws, churn by segment/region, ranked drivers, and a 'looks healthy but left' anomaly.",
+    file:"lab/STEP-2-analyze-and-find-gaps.md",
+    prompt:`Now act as a senior data analyst and analyze nice_cxone_churn.csv in depth. I want four things,
+with the actual numbers behind every claim:
+
+1. DATA QUALITY — Find every problem in the data: missing values, blanks, impossible values
+   (e.g. usage above 100%, negative tenure), duplicates, and suspicious outliers. For each one,
+   tell me how many rows are affected and how you'd clean or handle it.
+
+2. THE BIG PICTURE — What's the overall churn rate? Then break churn down by segment, by region,
+   by industry, and by contract type. Call out where it's surprisingly high or low.
+
+3. CHURN DRIVERS — Which columns most separate the customers who churned from the ones who stayed?
+   Rank the top drivers and show the difference in numbers for each.
+
+4. ANOMALIES & SURPRISES — Find anything counterintuitive. In particular: are there customers who
+   look healthy on the surface but still left? Does the churn_risk_score column actually agree with
+   who really churned — and where does it get it wrong?
+
+Finish with the 3 most important, non-obvious insights a NiCE manager should know, in plain English.
+Treat this as synthetic data, so describe the relationships you find as patterns in THIS dataset.`
+  },
+  {
+    n:3, title:"Build a stunning landing page", time:"~15 min",
+    goal:"Turn the insights into a beautiful, executive-ready web page.",
+    expect:"One self-contained HTML file with a hero number, charts, and the 'silent churners' callout.",
+    file:"lab/STEP-3-build-landing-page.md",
+    prompt:`Build me a single, self-contained HTML file (one file: inline CSS and JavaScript, no build step,
+works by double-clicking it) that presents the key insights from nice_cxone_churn.csv as a
+stunning, modern, executive "data story" web page.
+
+Include:
+- A bold hero section with the single headline finding and the overall churn number.
+- The top churn drivers shown as clean, labeled charts.
+- The breakdown of churn by segment and by region.
+- A standout callout for the "silent churners" — high-value customers who left while looking
+  healthy, because the current risk score missed them.
+- A short "what we should do about it" section at the end.
+
+Make it beautiful: a polished dark theme, big readable typography, smooth scrolling, animated
+number counters, and real chart visualizations (you can load a charting library like Chart.js
+from a CDN). Use the actual numbers from the analysis so the values are correct. It should look
+like something I'd be proud to put on screen in front of executives. Give me the finished HTML file.`
+  },
+  {
+    n:4, title:"Compare with competitors & propose an MVP", time:"~15 min · web search helps",
+    goal:"Scout the CCaaS market, find NiCE's gaps, and shape one focused product idea.",
+    expect:"A competitive read (Genesys, Five9, Talkdesk…) and one tight, realistic MVP proposal.",
+    file:"lab/STEP-4-competitors-and-mvp.md",
+    prompt:`Based on what we found in NiCE CXone's data, I want to turn insight into action. Our key findings:
+- Low product adoption / unused seats ("shelfware") is a top driver of churn.
+- A region (APAC in the data) churns far more, and the real cause is an onboarding gap, not geography.
+- A group of high-value "silent" customers churn while looking healthy, because the current
+  churn-risk score ignores declining usage.
+
+First, research NiCE CXone's main competitors in the contact-center / CCaaS market — for example
+Genesys, Five9, Talkdesk, Amazon Connect, Cisco, 8x8, Twilio Flex. For each, what do they offer
+around customer health, churn prevention, adoption, and proactive customer success? What are
+customers praising or complaining about?
+
+Then tell me:
+- Where is NiCE ahead, and where is it behind these competitors on keeping customers?
+- Based on the competitive picture AND our data findings, propose ONE focused MVP feature NiCE
+  should build to reduce churn.
+
+Describe the MVP in one tight paragraph: what it is, who it's for, the single problem it solves,
+and why it would win. Keep it realistic and as minimal as possible — the smallest thing that
+delivers the value.`
+  },
+  {
+    n:5, title:"Build the MVP prototype", time:"~15 min · fake data only",
+    goal:"A clickable prototype of the idea — minimal, mock data, no backend.",
+    expect:"One self-contained HTML file you can double-click and click through.",
+    file:"lab/STEP-5-build-the-mvp.md",
+    prompt:`Now build a working prototype of that MVP as a single self-contained HTML file (inline CSS and
+JavaScript, no backend, no real data — use a small amount of hardcoded mock data that you make up).
+
+Keep it as minimal as possible: the smallest version that demonstrates the core idea end-to-end
+and feels real to click through. If the MVP is an early-warning "customer health radar," then show
+a dashboard of mock accounts with a smarter health score that also reacts to declining usage,
+clearly flag the "silent at-risk" accounts that an old satisfaction-only score would miss, and let
+me click an account to see why it's at risk and one recommended action.
+
+Modern, clean, professional UI. It must work by just double-clicking the file. Put a short comment
+at the very top of the file stating what it is and that all the data is fake sample data.
+Give me the finished HTML file.`
+  },
+  {
+    n:6, title:"Create the management deck", time:"~15 min · NiCE brand",
+    goal:"An on-brand deck that pitches leadership on what you found and why to invest.",
+    expect:"A 9-slide story: what we did, the findings, the blind spot, the MVP, and the ask.",
+    file:"lab/STEP-6-management-deck.md",
+    note:`No nice-brand skill? Paste the brand brief from the brand cheat-sheet (charcoal #21212b + NiCE blue #3694fc, Be Vietnam Pro, sentence case, "Create a NiCE world.") in front of this prompt and ask for a self-contained HTML slide deck.`,
+    prompt:`Use the nice-brand skill to create a management presentation deck for NiCE leadership.
+
+The story: in one short workshop we took our NiCE CXone customer data, analyzed it with AI, and
+found churn insights worth acting on. Walk leadership through it and ask for buy-in.
+
+Cover, one idea per slide:
+1. Title + the one-line message.
+2. What we did (analyzed our customer data with AI in an afternoon).
+3. The headline churn findings, with the real numbers.
+4. The blind spot: "silent" high-value customers our current risk score misses.
+5. The onboarding-gap finding behind the high-churn region.
+6. The competitive gap vs other CCaaS vendors.
+7. The MVP we propose — what it is and who it helps.
+8. The ask: why we should invest, and the expected payoff.
+9. Close on a confident recommendation.
+
+Keep it fully on-brand and lead with outcomes, then the numbers.`
+  }
+];
+
+/* render step cards */
+const list = document.getElementById('stepList');
+STEPS.forEach((s, idx) => {
+  const card = document.createElement('div');
+  card.className = 'step reveal';
+  const pre = document.createElement('pre');
+  pre.className = 'prompt';
+  pre.textContent = s.prompt;            // textContent => exact characters, no escaping bugs
+  const noteHtml = s.note ? `<div class="note">💡 ${s.note}</div>` : '';
+  card.innerHTML = `
+    <div class="step-head">
+      <div class="num">${s.n}</div>
+      <div><h3>${s.title}</h3><div class="meta">${s.time}</div></div>
+    </div>
+    <p class="goal">${s.goal}</p>
+    <div class="prompt-box">
+      <div class="bar"><span class="lbl">prompt — paste into Claude</span>
+        <button class="copy-btn" data-i="${idx}">⧉ Copy</button></div>
+    </div>
+    ${noteHtml}
+    <p class="expect"><b>What you'll get →</b> ${s.expect}</p>
+    <div class="step-foot">
+      <a class="mini" href="${s.file}" download>📄 Full step guide</a>
+    </div>`;
+  card.querySelector('.prompt-box').appendChild(pre);
+  list.appendChild(card);
+});
+
+/* copy buttons */
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('.copy-btn');
+  if(!btn) return;
+  const text = STEPS[+btn.dataset.i].prompt;
+  try{
+    await navigator.clipboard.writeText(text);
+  }catch(err){
+    const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);
+    ta.select();document.execCommand('copy');ta.remove();
+  }
+  const old = btn.innerHTML;
+  btn.classList.add('done'); btn.innerHTML='✓ Copied!';
+  setTimeout(()=>{btn.classList.remove('done');btn.innerHTML=old;}, 1700);
+});
+
+/* animated counters */
+const animate = (el) => {
+  const to = +el.dataset.to; const dur=1100; const start=performance.now();
+  const tick = (now) => {
+    const p = Math.min((now-start)/dur, 1);
+    const e = 1-Math.pow(1-p,3);
+    el.textContent = Math.round(to*e).toLocaleString();
+    if(p<1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+};
+const io = new IntersectionObserver((ents)=>{
+  ents.forEach(en=>{ if(en.isIntersecting){ en.target.querySelectorAll?.('[data-to]')?.forEach(animate);
+    en.target.classList.add('in'); io.unobserve(en.target);} });
+},{threshold:.18});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+document.querySelectorAll('.stat').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
