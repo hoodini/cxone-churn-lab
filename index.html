@@ -180,6 +180,37 @@
 
   .reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
   .reveal.in{opacity:1;transform:none}
+
+  /* ---- live data preview table ---- */
+  .pv-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 14px}
+  .pv-search{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid var(--line);
+    border-radius:var(--radius-pill);padding:9px 15px;flex:1;min-width:200px;max-width:360px}
+  .pv-search .ms{color:var(--mut-2);font-size:18px}
+  .pv-search input{background:none;border:none;outline:none;color:var(--nice-white);font-family:inherit;font-size:14px;width:100%}
+  .pv-search input::placeholder{color:var(--mut-2)}
+  .pv-toggle{display:inline-flex;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:var(--radius-pill);padding:3px}
+  .pv-toggle button{font-family:inherit;font-size:13px;font-weight:var(--w-medium);color:var(--mut);background:none;border:none;
+    padding:7px 14px;border-radius:var(--radius-pill);cursor:pointer;transition:.18s}
+  .pv-toggle button.on{background:var(--nice-blue);color:#fff}
+  .pv-count{font-size:13.5px;color:var(--mut-2);margin-left:auto;white-space:nowrap}
+  .pv-grid-wrap{border:1px solid var(--line);border-radius:18px;overflow:auto;max-height:560px;background:rgba(0,0,0,.20);
+    -webkit-overflow-scrolling:touch}
+  table.pv{border-collapse:separate;border-spacing:0;width:100%;font-size:13px;white-space:nowrap}
+  table.pv thead th{position:sticky;top:0;z-index:2;background:#1b1b25;color:var(--mut);font-weight:var(--w-medium);
+    text-align:left;padding:12px 14px;border-bottom:1px solid var(--line)}
+  table.pv tbody td{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.05);color:#d4d4de}
+  table.pv tbody tr:hover td{background:rgba(54,148,252,.07)}
+  table.pv td.pvnum{text-align:right;font-variant-numeric:tabular-nums}
+  table.pv tbody tr:last-child td{border-bottom:none}
+  .pv-badge{display:inline-block;padding:3px 11px;border-radius:var(--radius-pill);font-size:11.5px;font-weight:var(--w-medium)}
+  .pv-badge.active{background:rgba(0,226,160,.14);color:var(--nice-emerald)}
+  .pv-badge.churned{background:rgba(255,91,138,.16);color:var(--nice-pink)}
+  .pv-risk{display:inline-flex;align-items:center;gap:8px;font-variant-numeric:tabular-nums}
+  .pv-bar{width:42px;height:6px;border-radius:3px;background:rgba(255,255,255,.12);overflow:hidden;display:inline-block;vertical-align:middle}
+  .pv-bar i{display:block;height:100%;border-radius:3px}
+  .pv-empty{padding:34px;text-align:center;color:var(--mut-2)}
+  .pv-note{font-size:12.5px;color:var(--mut-2);margin-top:12px}
+  @media(max-width:720px){.pv-grid-wrap{max-height:460px}}
 </style>
 </head>
 <body>
@@ -194,6 +225,7 @@
     </a>
     <div class="nav-links">
       <a href="#dataset">Dataset</a>
+      <a href="#preview">Preview</a>
       <a href="#steps">The 6 steps</a>
       <a href="#how">How to use</a>
       <a class="nice-btn dl" href="#download"><span class="ms">download</span> Download</a>
@@ -253,6 +285,27 @@
       <div class="chip"><span class="ms">rocket_launch</span><span class="t">Ship an MVP</span></div>
       <div class="chip"><span class="ms">co_present</span><span class="t">Pitch leadership</span></div>
     </div>
+  </div>
+</section>
+
+<!-- PREVIEW -->
+<section id="preview">
+  <div class="wrap reveal">
+    <div class="eyebrow">Take a look</div>
+    <h2>See the data before you analyze it.</h2>
+    <p class="sub">This is the actual file, loaded live in your browser. Skim it, search it, get a feel for the columns — then let Claude do the heavy lifting below. No charts or conclusions here on purpose: finding those is your job in step 2.</p>
+    <div class="pv-toolbar">
+      <label class="pv-search"><span class="ms">search</span>
+        <input id="pvSearch" type="text" placeholder="Search company, region, industry, reason…" autocomplete="off" />
+      </label>
+      <span class="pv-toggle">
+        <button id="pvKey" class="on" type="button">Key columns</button>
+        <button id="pvAll" type="button">All 40</button>
+      </span>
+      <span class="pv-count" id="pvCount">loading…</span>
+    </div>
+    <div class="pv-grid-wrap"><table class="pv"><thead id="pvHead"></thead><tbody id="pvBody"></tbody></table></div>
+    <div class="pv-note" id="pvNote"></div>
   </div>
 </section>
 
@@ -522,6 +575,73 @@ const io = new IntersectionObserver((ents)=>{
 },{threshold:.18});
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 document.querySelectorAll('.stat').forEach(el=>io.observe(el));
+
+/* ---- live data preview: fetch + parse the real CSV, render a searchable table ---- */
+(function(){
+  const KEY_COLS=["company_name","industry","region","segment","contract_type","arr_usd",
+    "seat_utilization","modules_adopted","usage_trend_pct","avg_csat","churn_risk_score","status"];
+  const NUMERIC=new Set(["employees","tenure_months","arr_usd","licensed_seats","active_seats","seat_utilization",
+    "modules_adopted","digital_channel_share_pct","monthly_interactions","usage_trend_pct","avg_login_freq_per_week",
+    "time_to_value_days","qbrs_last_12m","support_tickets_90d","critical_incidents_12m","avg_csat","nps_last",
+    "discount_pct","price_increase_at_renewal_pct","days_payment_overdue","expansion_arr_usd","health_score","churn_risk_score","churned"]);
+  const PCT=new Set(["usage_trend_pct","digital_channel_share_pct","discount_pct","price_increase_at_renewal_pct"]);
+  const PRETTY={company_name:"Company",arr_usd:"ARR (USD)",seat_utilization:"Seat util.",modules_adopted:"Modules",
+    usage_trend_pct:"Usage trend",avg_csat:"CSAT",churn_risk_score:"Risk score",contract_type:"Contract",
+    churn_risk_score_:"Risk"};
+  const MAX=100;
+  let HEADERS=[],ROWS=[],showAll=false;
+  const body=document.getElementById('pvBody'),head=document.getElementById('pvHead'),
+    countEl=document.getElementById('pvCount'),noteEl=document.getElementById('pvNote'),searchEl=document.getElementById('pvSearch');
+  if(!body) return;
+
+  function parseCSV(t){const rows=[];let i=0,f='',row=[],q=false;
+    while(i<t.length){const c=t[i];
+      if(q){ if(c==='"'){ if(t[i+1]==='"'){f+='"';i++;}else q=false; } else f+=c; }
+      else { if(c==='"')q=true; else if(c===','){row.push(f);f='';}
+        else if(c==='\n'||c==='\r'){ if(c==='\r'&&t[i+1]==='\n')i++; if(f!==''||row.length){row.push(f);rows.push(row);row=[];f='';} }
+        else f+=c; }
+      i++; }
+    if(f!==''||row.length){row.push(f);rows.push(row);} return rows; }
+  const esc=(s)=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  const pretty=(h)=> PRETTY[h] || h.replace(/_/g,' ').replace(/\bpct\b/gi,'%').replace(/\b\w/g,c=>c.toUpperCase());
+  function fmt(h,v){
+    if(v===''||v==null) return '<span style="color:var(--mut-2)">—</span>';
+    if(h==='arr_usd'||h==='expansion_arr_usd'){const n=+v;return isNaN(n)?esc(v):'$'+n.toLocaleString();}
+    if(h==='seat_utilization'){const n=+v;return isNaN(n)?esc(v):(n*100).toFixed(0)+'%';}
+    if(PCT.has(h)){const n=+v;return isNaN(n)?esc(v):n+'%';}
+    return esc(v);
+  }
+  function riskCell(v){const n=+v;if(isNaN(n))return esc(v);
+    const col=n<40?'var(--nice-emerald)':n<66?'var(--nice-blue)':'var(--nice-pink)';
+    return '<span class="pv-risk"><span class="pv-bar"><i style="width:'+n+'%;background:'+col+'"></i></span>'+n+'</span>';}
+  const statusBadge=(v)=> '<span class="pv-badge '+(v==='Active'?'active':'churned')+'">'+esc(v)+'</span>';
+
+  function render(){
+    const cols= showAll? HEADERS : KEY_COLS.filter(c=>HEADERS.includes(c));
+    const term=searchEl.value.trim().toLowerCase();
+    const filtered= term ? ROWS.filter(r=>HEADERS.some(c=>String(r[c]||'').toLowerCase().includes(term))) : ROWS;
+    head.innerHTML='<tr>'+cols.map(c=>'<th>'+pretty(c)+'</th>').join('')+'</tr>';
+    if(!filtered.length){ body.innerHTML='<tr><td class="pv-empty" colspan="'+cols.length+'">No rows match “'+esc(searchEl.value)+'”.</td></tr>';
+      countEl.textContent='0 of '+ROWS.length.toLocaleString()+' rows'; noteEl.textContent=''; return; }
+    body.innerHTML=filtered.slice(0,MAX).map(r=>'<tr>'+cols.map(c=>{
+      let cell = c==='status'?statusBadge(r[c]) : c==='churn_risk_score'?riskCell(r[c]) : fmt(c,r[c]);
+      const cls=(NUMERIC.has(c)&&c!=='churn_risk_score')?' class="pvnum"':'';
+      return '<td'+cls+'>'+cell+'</td>'; }).join('')+'</tr>').join('');
+    countEl.textContent=filtered.length.toLocaleString()+' of '+ROWS.length.toLocaleString()+' rows';
+    noteEl.textContent= filtered.length>MAX ? 'Showing the first '+MAX+' — search to narrow it down, or download the full CSV above.' : '';
+  }
+  function setToggle(){document.getElementById('pvKey').classList.toggle('on',!showAll);document.getElementById('pvAll').classList.toggle('on',showAll);}
+
+  fetch('data/nice_cxone_churn.csv').then(r=>{if(!r.ok)throw 0;return r.text();}).then(text=>{
+    const m=parseCSV(text); HEADERS=m.shift();
+    ROWS=m.filter(r=>r.length>1).map(r=>{const o={};HEADERS.forEach((h,i)=>o[h]=r[i]);return o;});
+    render();
+    searchEl.addEventListener('input',render);
+    document.getElementById('pvKey').addEventListener('click',()=>{showAll=false;setToggle();render();});
+    document.getElementById('pvAll').addEventListener('click',()=>{showAll=true;setToggle();render();});
+  }).catch(()=>{ countEl.textContent='';
+    noteEl.innerHTML='Couldn\'t load the inline preview — <a href="data/nice_cxone_churn.csv" download style="color:var(--nice-blue)">download the CSV</a> to view it.'; });
+})();
 </script>
 </body>
 </html>
